@@ -1,12 +1,12 @@
-require 'pp'
-require 'async'
-require 'async/barrier'
-require 'async/semaphore'
-require 'nokogiri'
-require 'httpclient'
+require "pp"
+require "async"
+require "async/barrier"
+require "async/semaphore"
+require "nokogiri"
+require "httpclient"
 
-require 'mvnrepocopy/storage'
-require 'mvnrepocopy/progress'
+require "mvnrepocopy/storage"
+require "mvnrepocopy/progress"
 
 module Mvnrepocopy
   class MirrorHttp
@@ -29,7 +29,7 @@ module Mvnrepocopy
     # returns:: the list of download URLs found
     def scan_recursive()
       if(@cache) 
-        urls = @storage.read_cache('download_urls')
+        urls = @storage.read_cache("download_urls")
 
         if(urls && !urls.empty?)
           @log.info "Download URLs read from cache file"
@@ -40,7 +40,7 @@ module Mvnrepocopy
       @log.info "Scanning for download links in repo #{@baseurl}"
       Sync do 
         urls = scan(@baseurl)
-        @storage.write_cache('download_urls', urls)
+        @storage.write_cache("download_urls", urls)
         urls
       end
     end

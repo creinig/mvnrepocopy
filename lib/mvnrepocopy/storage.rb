@@ -1,5 +1,5 @@
-require 'fileutils'
-require 'singleton'
+require "fileutils"
+require "singleton"
 
 module Mvnrepocopy
   class Storage
@@ -13,9 +13,9 @@ module Mvnrepocopy
       @operation = operation.to_s
       @verbose = verbose
       @starttime = Time.new
-      @starttime_str = @starttime.strftime('%Y-%m-%d_%H:%M:%S')
+      @starttime_str = @starttime.strftime("%Y-%m-%d_%H:%M:%S")
 
-      Dir.mkdir('work') unless Dir.exist?('work')
+      Dir.mkdir("work") unless Dir.exist?("work")
       @basedir = Dir.new("work")
 
       ObjectSpace.define_finalizer(self, self.class.create_finalizer(logfile()))
@@ -76,13 +76,13 @@ module Mvnrepocopy
     private #----------------------------------
 
     def log2file(msg)
-      timestamp = Time.now.strftime('%Y-%m-%d_%H:%M:%S')
+      timestamp = Time.now.strftime("%Y-%m-%d_%H:%M:%S")
 
       logfile().puts "#{timestamp} #{msg}"
     end
 
     def logfile()
-      @logfile ||= File.new(mkdirs_for("#{@reponame}-#{@starttime_str}.log", :log), 'a')
+      @logfile ||= File.new(mkdirs_for("#{@reponame}-#{@starttime_str}.log", :log), "a")
     end
 
     def dir(*parts)
@@ -100,11 +100,11 @@ module Mvnrepocopy
     def target_dir(target)
       case target
       when :repo
-        File.join(@basedir, 'repos', @reponame)
+        File.join(@basedir, "repos", @reponame)
       when :log
-        File.join(@basedir, @operation, 'log')
+        File.join(@basedir, @operation, "log")
       when :cache
-        File.join(@basedir, @operation, 'cache')
+        File.join(@basedir, @operation, "cache")
       else
         raise ArgumentError, "Unsupported target #{target}", caller
       end

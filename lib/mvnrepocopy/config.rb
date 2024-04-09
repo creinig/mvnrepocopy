@@ -1,7 +1,7 @@
-require 'optparse'
-require 'ostruct'
+require "optparse"
+require "ostruct"
 
-require_relative 'version'
+require_relative "version"
 
 
 module Mvnrepocopy

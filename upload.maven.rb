@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'bundler/setup'
+require "bundler/setup"
 
-require 'mvnrepocopy/upload_maven_config'
-require 'mvnrepocopy/upload_maven'
-require 'mvnrepocopy/storage'
-require 'mvnrepocopy/sanitize_pom'
+require "mvnrepocopy/upload_maven_config"
+require "mvnrepocopy/upload_maven"
+require "mvnrepocopy/storage"
+require "mvnrepocopy/sanitize_pom"
 
 include Mvnrepocopy
 

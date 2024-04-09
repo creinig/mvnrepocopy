@@ -1,4 +1,4 @@
-require_relative 'mirror_http'
+require_relative "mirror_http"
 
 module Mvnrepocopy
   class MirrorHttpNexus < MirrorHttp

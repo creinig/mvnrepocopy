@@ -1,4 +1,4 @@
-require_relative 'config'
+require_relative "config"
 
 
 module Mvnrepocopy
@@ -20,6 +20,10 @@ module Mvnrepocopy
 
       opts.on("-pP", "--pass=USERNAME", "Password for the target maven repository") do |pass|
         options.pass = pass
+      end
+
+      opts.on("--filter=REGEX", "Only upload packages matching this regular expression") do |regex|
+        options.filter = regex
       end
     end
 

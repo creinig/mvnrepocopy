@@ -1,4 +1,4 @@
-require_relative 'config'
+require_relative "config"
 
 
 module Mvnrepocopy
@@ -16,7 +16,7 @@ module Mvnrepocopy
         options.repo = repo
       end
 
-      opts.on('-c', '--[no-]cache', "Use cached list of URLs etc if present") do |v|
+      opts.on("-c", "--[no-]cache", "Use cached list of URLs etc if present") do |v|
         options.cache = v
       end
     end

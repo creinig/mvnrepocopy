@@ -1,14 +1,14 @@
-require 'open3'
-require 'async'
-require 'async/barrier'
-require 'async/semaphore'
-require 'base64'
-require 'uri'
-require 'httpclient'
+require "open3"
+require "async"
+require "async/barrier"
+require "async/semaphore"
+require "base64"
+require "uri"
+require "httpclient"
 
-require 'mvnrepocopy/storage'
-require 'mvnrepocopy/progress'
-require 'mvnrepocopy/sanitize_pom'
+require "mvnrepocopy/storage"
+require "mvnrepocopy/progress"
+require "mvnrepocopy/sanitize_pom"
 
 module Mvnrepocopy
   # Upload a local maven repository to a remote one.
@@ -82,7 +82,7 @@ module Mvnrepocopy
     end
 
     def find_package_dirs()
-      Dir.glob('**/*.pom', base: @storage.repodir.path)
+      Dir.glob("**/*.pom", base: @storage.repodir.path)
         .select{|f| !@filter_regex or f.match(@filter_regex)}
         .map{|f| File.join(@storage.repodir.path, File.dirname(f))}
     end
@@ -114,7 +114,7 @@ module Mvnrepocopy
     end
 
     def is_text_type?(content_type)
-      content_type && ! ['text/', '/json', '/xml'].select{|part| content_type.include? part }.empty?
+      content_type && ! ["text/", "/json", "/xml"].select{|part| content_type.include? part }.empty?
     end
 
     def exists_on_server?(path, http)
