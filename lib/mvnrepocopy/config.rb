@@ -48,6 +48,10 @@ module Mvnrepocopy
       opts.separator ""
       opts.separator "Common Options:"
 
+      opts.on("-n", '--[no-]dry-run', 'Do not actually upload anything') do |dry|
+        options.dry_run = dry
+      end
+
       opts.on("-jN", "--concurrency=N", Integer,  "Maximum number of concurrent requests") do |concurrency|
         options.concurrency = concurrency
       end
