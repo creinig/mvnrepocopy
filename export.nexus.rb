@@ -13,7 +13,7 @@ log = Storage.instance
 log.setup(options.repo, :export_nexus, options.verbose)
 log.info "Detailed information will be written to #{log.logfile_name}"
 
-mirror = MirrorHttpNexus.new(options.url, options.repo, options.concurrency, options.verbose, options.cache)
+mirror = MirrorHttpNexus.new(options.url, options.repo, options.concurrency, options.cache)
 download_urls = mirror.scan_recursive()
 
 log.info "Found #{download_urls.length} files"

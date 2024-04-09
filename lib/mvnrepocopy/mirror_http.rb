@@ -10,9 +10,8 @@ require 'mvnrepocopy/progress'
 
 module Mvnrepocopy
   class MirrorHttp
-    def initialize(baseurl, concurrency, verbose, cache)
+    def initialize(baseurl, concurrency, cache)
       @baseurl = baseurl
-      @verbose = verbose
       @cache = cache
       @concurrency = concurrency
       @storage = Storage.instance
