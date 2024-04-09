@@ -45,13 +45,13 @@ module Mvnrepocopy
 
     # get all lines in the specified cache file
     def read_cache(name)
-      fullname = mkdirs_for(name, :cache)
+      fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
       File.exist?(fullname) ? File.open(fullname, 'r') {|f| f.readlines(chomp: true)} : []
     end
 
     def write_cache(name, lines)
-      fullname = mkdirs_for(name, :cache)
+      fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
       File.open(fullname, 'w') {|f| f.puts(lines) }
     end

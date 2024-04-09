@@ -34,7 +34,8 @@ module Mvnrepocopy
 
       @log.info "Scanning for download links in repo #{@baseurl}"
       Sync do 
-        urls = scan(@baseurl)
+        progress = Progress.new
+        urls = scan(@baseurl, progress)
 
         # only return download URLs
         urls.reject{|u| is_index?(u)}
@@ -84,15 +85,16 @@ module Mvnrepocopy
     # Fetch the given URL, parse the response and recursively scan all relative links in the response HTML
     #
     # returns:: the list of found download URLs 
-    def scan(url)
+    def scan(url, progress)
       request(url) do |url, response|
         if(response.headers['content-type']&.include?("html"))
           relative_links = extract_links(response.read, url)
 
           relative_links.map do |url|
             if(is_index?(url)) 
-              scan(url)
+              scan(url, progress)
             else
+              progress.inc
               [url]
             end
           end.flatten
