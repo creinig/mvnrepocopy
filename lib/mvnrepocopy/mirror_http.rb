@@ -62,23 +62,13 @@ module Mvnrepocopy
     #
     # returns:: the list of found download URLs 
     def scan(url)
-      internet = Async::HTTP::Internet.instance
       download_urls = []
 
-      begin
-        @log.debug "Request to #{url}"
-        response = internet.get(url)
-        if(is_redirect?(response))
-          @log.debug "  Redirect (#{response.status}) to #{response.headers['location']}"
-          response = internet.get(response.headers['location'])
-        end
-
-        @log.debug "  Response for #{url}: #{response.status}"
-
-        if((response.status == 200) && response.headers['content-type']&.include?("html"))
+      request(url) do |url, response|
+        if(response.headers['content-type']&.include?("html"))
           relative_links = extract_links(response.read, url)
 
-          download_urls = relative_links.map do |url|
+          relative_links.map do |url|
             if(is_index?(url)) 
               scan(url)
             else
@@ -86,11 +76,10 @@ module Mvnrepocopy
             end
           end.flatten
         else
-          @log.error "  Response for #{url}: #{response.status}"
+          @log.error "  Response for #{url}: Content-Type is #{response.headers['content-type']}"
+          []
         end
       end
-
-      download_urls
     end
 
     def is_redirect?(response)
@@ -98,8 +87,6 @@ module Mvnrepocopy
     end
 
     def extract_links(html, url)
-      paths = []
-
       doc = Nokogiri(html)
       refs = doc.xpath("//a/@href").to_a.map{|a| a.value}
 
@@ -107,6 +94,26 @@ module Mvnrepocopy
       refs
         .map {|path| sanitize_link(path, url)}
         .select {|path| path}
+    end
+
+    def request(url, &success_handler)
+      internet = Async::HTTP::Internet.instance
+
+      @log.debug "Request to #{url}"
+      response = internet.get(url)
+
+      if(is_redirect?(response))
+        @log.debug "  Redirect (#{response.status}) to #{response.headers['location']}"
+        response = internet.get(response.headers['location'])
+      end
+
+      @log.debug "  Response for #{url}: #{response.status}"
+
+      if(response.status == 200)
+        success_handler.yield(url, response)
+      else
+        @log.error "  Response for #{url}: #{response.status}"
+      end
     end
   end
 end
