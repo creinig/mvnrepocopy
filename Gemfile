@@ -15,3 +15,7 @@ gem "rubocop", "~> 1.21"
 gem "async", "~> 1.31"
 
 gem "pry", "~> 0.14.2"
+
+gem "async-http", "~> 0.63.0"
+
+gem "thread-local", "~> 1.1"
