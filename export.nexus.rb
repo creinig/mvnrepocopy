@@ -4,17 +4,23 @@ require 'bundler/setup'
 
 require 'mvnrepocopy/export_nexus_config'
 require 'mvnrepocopy/scan_http_nexus'
+require 'mvnrepocopy/storage'
 
-options = Mvnrepocopy::ExportNexusConfig.new.parse(ARGV)
+include Mvnrepocopy
 
+options = ExportNexusConfig.new.parse(ARGV)
+log = Storage.instance
+log.setup(options.repo, :export_nexus, options.verbose)
 
-scanner = Mvnrepocopy::ScanHttpNexus.new(options.url, options.repo, options.concurrency, options.verbose)
+log.info "Scanning for download links in repo '#{options.repo}' at #{options.url}"
+scanner = ScanHttpNexus.new(options.url, options.repo, options.concurrency, options.verbose)
 download_urls = scanner.scan_recursive()
 
-pp download_urls
+log.info "Found #{download_urls.length} files"
+pp download_urls if Storage.instance.debug?
 # DONE: async PoC w/ HTTP requests
 # TODO: local workdir mgmt
-# TODO: HTML link parsing
+# DONE: HTML link parsing
 # TODO: download tasks
 # TODO: error & status logging & persisting
 # XXX: config file

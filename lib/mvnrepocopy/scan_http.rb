@@ -5,6 +5,7 @@ require 'async/semaphore'
 require 'async/http/internet/instance'
 require 'nokogiri'
 
+require 'mvnrepocopy/storage'
 
 module Mvnrepocopy
   class ScanHttp
@@ -13,6 +14,8 @@ module Mvnrepocopy
       @verbose = verbose
       @barrier = Async::Barrier.new
       @semaphore = Async::Semaphore.new(concurrency, parent: @barrier)
+      @storage = Storage.instance
+      @log = @storage
     end
 
     # Fetch the given repository index, parse the response and recursively scan all relative links
@@ -54,16 +57,16 @@ module Mvnrepocopy
       scanned = []
 
       begin
-        puts "Request to #{url}"
+        @log.debug "Request to #{url}"
         response = internet.get(url)
         if(is_redirect?(response))
-          puts "  Redirect (#{response.status}) to #{response.headers['location']}"
+          @log.debug "  Redirect (#{response.status}) to #{response.headers['location']}"
           response = internet.get(response.headers['location'])
         end
 
-        puts "  Response for #{url}: #{response.status}"
+        @log.debug "  Response for #{url}: #{response.status}"
 
-        if(response.headers['content-type']&.include?("html"))
+        if((response.status == 200) && response.headers['content-type']&.include?("html"))
           relative_links = extract_links(response.read, url)
           relative_links.each do |url|
             if(is_index?(url)) 
@@ -74,6 +77,8 @@ module Mvnrepocopy
               scanned << url
             end
           end
+        else
+          @log.error "  Response for #{url}: #{response.status}"
         end
       end
 
@@ -90,7 +95,7 @@ module Mvnrepocopy
       doc = Nokogiri(html)
       refs = doc.xpath("//a/@href").to_a.map{|a| a.value}
 
-      pp refs
+      pp refs if @log.debug?
       refs
         .map {|path| sanitize_link(path, url)}
         .select {|path| path}
