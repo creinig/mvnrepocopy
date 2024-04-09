@@ -48,6 +48,10 @@ module Mvnrepocopy
       opts.separator ""
       opts.separator "Common Options:"
 
+      opts.on("--filter=REGEX", "Only upload/download packages matching this regular expression") do |regex|
+        options.filter = regex
+      end
+
       opts.on("-n", '--[no-]dry-run', 'Do not actually upload anything') do |dry|
         options.dry_run = dry
       end

@@ -10,11 +10,12 @@ require 'mvnrepocopy/progress'
 
 module Mvnrepocopy
   class MirrorHttp
-    def initialize(baseurl, concurrency, cache, dry_run: false)
+    def initialize(baseurl, concurrency, cache, dry_run: false, filter: nil)
       @baseurl = baseurl
       @cache = cache
       @concurrency = concurrency
       @dry_run = dry_run
+      @filter = filter
       @storage = Storage.instance
       @log = @storage
 
@@ -46,6 +47,8 @@ module Mvnrepocopy
 
     # Download all files represented by the given array of URLs
     def download_files(urls)
+      urls = urls.select{|u| u.match? @filter} if @filter
+
       barrier = Async::Barrier.new
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
       progress = Progress.new(urls.length)

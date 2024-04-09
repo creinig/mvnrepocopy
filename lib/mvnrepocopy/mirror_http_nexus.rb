@@ -2,11 +2,11 @@ require_relative 'mirror_http'
 
 module Mvnrepocopy
   class MirrorHttpNexus < MirrorHttp
-    def initialize(url, reponame, concurrency, cache)
+    def initialize(url, reponame, concurrency, cache, dry_run: false, filter: nil)
       @browseurl = "#{url.sub(%r{/+$}, '')}/service/rest/repository/browse/#{reponame}"
       @downloadurl = "#{url.sub(%r{/+$}, '')}/repository/#{reponame}"
 
-      super(@browseurl, concurrency, cache)
+      super(@browseurl, concurrency, cache, dry_run: dry_run, filter: filter)
     end
 
     protected #----------------------

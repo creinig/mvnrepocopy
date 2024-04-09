@@ -21,14 +21,6 @@ module Mvnrepocopy
       opts.on("-pP", "--pass=USERNAME", "Password for the target maven repository") do |pass|
         options.pass = pass
       end
-
-      opts.on("-n", '--[no-]dry-run', 'Do not actually upload anything') do |dry|
-        options.dry_run = dry
-      end
-
-      opts.on("--filter=REGEX", "Only upload packages matching this regular expression") do |regex|
-        options.filter = regex
-      end
     end
 
     def validate(optparser, options)
