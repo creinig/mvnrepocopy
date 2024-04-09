@@ -36,6 +36,10 @@ module Mvnrepocopy
       log2file "ERROR #{msg}"
     end
 
+    def logfile_name()
+      logfile().path
+    end
+
     # create all directories for the given file, relative to the local repo
     #
     # returns:: the qualified path pointing to the file
