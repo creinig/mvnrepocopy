@@ -1,7 +1,5 @@
+require 'nokogiri'
 require 'rchardet'
-
-require 'mvnrepocopy/progress'
-require 'mvnrepocopy/storage'
 
 module Mvnrepocopy
   # Some maven repositories *cough*AzDO*cough* seem to have serious problems
@@ -11,6 +9,10 @@ module Mvnrepocopy
     def sanitize_pom(file, contents)
       contents = fix_encoding(contents)
       fix_packaging(file, contents)
+    end
+
+    def contains_jar?(dir)
+      !(Dir.glob(File.join(dir, "*.jar")).empty?)
     end
 
     private #------------------------
@@ -28,13 +30,11 @@ module Mvnrepocopy
     # Should be rare, but I've encountered POMs that were for a JAR, but had packaging "pom".
     # AzDO artifacts rejects those with a weirdly nonspecific XML parser exception
     def fix_packaging(file, contents)
-      has_jar = !(Dir.glob(File.join(File.dirname(file), "*.jar")).empty?)
+      doc = Nokogiri::XML(contents, &:noblanks)
+      packaging = doc.at_css('project>packaging') || doc.at_css('project>version').add_next_sibling('<packaging>pom</packaging>').first
+      packaging.content = (contains_jar?(File.dirname(file)) ? 'jar' : 'pom')
 
-      if has_jar
-        contents.gsub(%r{<packaging>pom</packaging>}, '<packaging>jar</packaging>')
-      else
-        contents
-      end
+      doc.to_xml
     end
   end
 end

@@ -53,7 +53,6 @@ GEM
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
     ruby-progressbar (1.13.0)
-    thread-local (1.1.0)
     timers (4.3.5)
     unicode-display_width (2.5.0)
 
@@ -70,7 +69,6 @@ DEPENDENCIES
   rake (~> 13.0)
   rchardet (~> 1.8)
   rubocop (~> 1.21)
-  thread-local (~> 1.1)
 
 BUNDLED WITH
    2.3.5
