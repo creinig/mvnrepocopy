@@ -54,6 +54,7 @@ GEM
     racc (1.7.3)
     rainbow (3.1.1)
     rake (13.1.0)
+    rchardet (1.8.0)
     regexp_parser (2.9.0)
     rexml (3.2.6)
     rubocop (1.60.2)
@@ -86,6 +87,7 @@ DEPENDENCIES
   nokogiri (~> 1.16)
   pry (~> 0.14.2)
   rake (~> 13.0)
+  rchardet (~> 1.8)
   rubocop (~> 1.21)
   thread-local (~> 1.1)
 

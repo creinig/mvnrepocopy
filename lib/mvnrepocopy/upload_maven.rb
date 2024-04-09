@@ -77,8 +77,8 @@ module Mvnrepocopy
       pom = jarfile.sub(/\.jar$/, '.pom')
 
       return pom if File.exist?(pom)
-
-      Dir.glob("*.pom", base: File.dirname(jarfile)).first
+      dir = File.dirname(jarfile)
+      File.join(dir, Dir.glob("*.pom", base: dir).first)
     end
 
     def mvn_deploy_file(opts)
