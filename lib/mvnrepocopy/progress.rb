@@ -1,6 +1,6 @@
 module Mvnrepocopy
   class Progress
-    def initialize(total_steps=nil, print_interval=50)
+    def initialize(total_steps = nil, print_interval = 50)
       @total_steps = total_steps
       @print_interval = print_interval
       @current = 0
@@ -10,9 +10,8 @@ module Mvnrepocopy
       @current += 1
 
       if ((@current % @print_interval == 0) || (@current == @total_steps))
-        puts "Progress: #{@current} of #{@total_steps || 'unknown'}" 
+        puts "Progress: #{@current} of #{@total_steps || 'unknown'}"
       end
     end
-
   end
 end

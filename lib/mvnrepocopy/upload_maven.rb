@@ -43,9 +43,9 @@ module Mvnrepocopy
       progress = Progress.new(package_dirs.length, 20)
 
       http = HTTPClient.new(:force_basic_auth => true)
-      http.set_auth(nil, @user, @passwd) if(@user && @passwd)
+      http.set_auth(nil, @user, @passwd) if (@user && @passwd)
       http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.keep_alive_timeout=60
+      http.keep_alive_timeout = 60
 
       Sync do
         package_dirs.map do |dir|
@@ -65,7 +65,7 @@ module Mvnrepocopy
     private #------------------------------------
 
     def upload_dir(dir, http)
-      files = Dir.glob(File.join(dir,'*.pom')).concat(Dir.glob(File.join(dir, '*.jar')))
+      files = Dir.glob(File.join(dir, '*.pom')).concat(Dir.glob(File.join(dir, '*.jar')))
 
       files.each do |file|
         if exists_on_server?(file, http)
@@ -83,12 +83,12 @@ module Mvnrepocopy
 
     def find_package_dirs()
       Dir.glob("**/*.pom", base: @storage.repodir.path)
-        .select { |f| !@filter_regex or f.match(@filter_regex) }
-        .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
+         .select { |f| !@filter_regex or f.match(@filter_regex) }
+         .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
     end
 
     def read_file(file)
-      if(file.end_with?(".pom"))
+      if (file.end_with?(".pom"))
         @sanitize_pom.sanitize_pom(file, IO.read(file))
       else
         IO.read(file)
@@ -105,7 +105,7 @@ module Mvnrepocopy
         @log.debug "Uploaded #{path}"
       else
         @log.error "Upload of #{path} failed with status #{response.status_code}"
-        if(is_text_type?(response.content_type))
+        if (is_text_type?(response.content_type))
           @log.debug "Error response fron #{path}: #{response.body}"
         end
       end
@@ -114,7 +114,7 @@ module Mvnrepocopy
     end
 
     def is_text_type?(content_type)
-      content_type && ! ["text/", "/json", "/xml"].select { |part| content_type.include? part }.empty?
+      content_type && ["text/", "/json", "/xml"].select { |part| content_type.include? part }.any?
     end
 
     def exists_on_server?(path, http)
@@ -122,7 +122,7 @@ module Mvnrepocopy
 
       response = http.head(url)
 
-      #@log.debug "HEAD #{url} => #{status}"
+      # @log.debug "HEAD #{url} => #{status}"
       response.status_code.to_i == 200
     end
 

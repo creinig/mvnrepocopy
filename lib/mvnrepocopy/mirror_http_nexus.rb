@@ -15,7 +15,7 @@ module Mvnrepocopy
       return link if link.start_with?(@downloadurl)
       return link if link.start_with?(@browseurl)
 
-      return "#{current_url.sub(%r{/+$}, '')}/#{link}" if link.match(%r{^([\w-]+\.)*[\w-]+/?$}) 
+      return "#{current_url.sub(%r{/+$}, '')}/#{link}" if link.match(%r{^([\w-]+\.)*[\w-]+/?$})
 
       nil
     end

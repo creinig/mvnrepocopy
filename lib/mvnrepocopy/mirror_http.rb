@@ -20,25 +20,25 @@ module Mvnrepocopy
       @log = @storage
 
       @http = HTTPClient.new
-      @http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE 
-      @http.keep_alive_timeout=60
+      @http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      @http.keep_alive_timeout = 60
     end
 
     # Fetch the given repository index, parse the response and recursively scan all relative links
     #
     # returns:: the list of download URLs found
     def scan_recursive()
-      if(@cache) 
+      if (@cache)
         urls = @storage.read_cache("download_urls")
 
-        if(urls && !urls.empty?)
+        if (urls && !urls.empty?)
           @log.info "Download URLs read from cache file"
           return urls
         end
       end
 
       @log.info "Scanning for download links in repo #{@baseurl}"
-      Sync do 
+      Sync do
         urls = scan(@baseurl)
         @storage.write_cache("download_urls", urls)
         urls
@@ -84,10 +84,10 @@ module Mvnrepocopy
 
     private # ----------------
 
-    # Fetch the given URL, parse the response and "recursively" scan all 
+    # Fetch the given URL, parse the response and "recursively" scan all
     # relative links in the response HTML
     #
-    # returns:: the list of found download URLs 
+    # returns:: the list of found download URLs
     def scan(url)
       index_urls = [url]
       download_urls = []
@@ -123,7 +123,7 @@ module Mvnrepocopy
       doc = Nokogiri(html)
       refs = doc.xpath("//a/@href").to_a.map { |a| a.value }
 
-      #pp refs if @log.debug?
+      # pp refs if @log.debug?
       refs
         .map { |path| sanitize_link(path, url) }
         .select { |path| path }
@@ -132,7 +132,7 @@ module Mvnrepocopy
     def download(url)
       localfile = @storage.mkdirs_for(to_repopath(url))
 
-      if(File.exist?(localfile))
+      if (File.exist?(localfile))
         @log.debug "Skipping #{url} - already exists locally"
         return
       end

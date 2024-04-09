@@ -1,8 +1,6 @@
 require_relative "config"
 
-
 module Mvnrepocopy
-
   # Commandline parser for the upload.maven.rb command
   class UploadMavenConfig < Config
     def add_specific_options(opts, options)
@@ -28,7 +26,7 @@ module Mvnrepocopy
     end
 
     def validate(optparser, options)
-      unless(options.url&.start_with?(%r_https?://_))
+      unless (options.url&.start_with?(%r_https?://_))
         error optparser, "'url' option missing or not an HTTP(s) URL"
       end
 
@@ -38,5 +36,3 @@ module Mvnrepocopy
     end
   end
 end
-
-

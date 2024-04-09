@@ -4,7 +4,6 @@ require 'minitest'
 require 'nokogiri'
 
 module Mvnrepocopy
-
   class TestSanitizePom < Minitest::Test
     def setup
       @sanitizer = SanitizePom::new
@@ -28,7 +27,7 @@ module Mvnrepocopy
       end
     end
 
-    POM_JAR="""
+    POM_JAR = """
     <project>
       <name>foo</name>
       <groupId>foo.bar</groupId>
@@ -40,7 +39,5 @@ module Mvnrepocopy
 
     POM_POM = POM_JAR.sub('<packaging>jar</packaging>', '<packaging>pom</packaging>')
     POM_DEFAULT = POM_JAR.sub('<packaging>jar</packaging>', '')
-
   end
-
 end

@@ -3,10 +3,8 @@ require "ostruct"
 
 require_relative "version"
 
-
 module Mvnrepocopy
   class Config
-
     def parse(args)
       options = OpenStruct.new
       options.concurrency = 1
@@ -44,7 +42,7 @@ module Mvnrepocopy
       exit
     end
 
-    private def add_common_options(opts, options) 
+    private def add_common_options(opts, options)
       opts.separator ""
       opts.separator "Common Options:"
 
@@ -56,7 +54,7 @@ module Mvnrepocopy
         options.dry_run = dry
       end
 
-      opts.on("-jN", "--concurrency=N", Integer,  "Maximum number of concurrent requests") do |concurrency|
+      opts.on("-jN", "--concurrency=N", Integer, "Maximum number of concurrent requests") do |concurrency|
         options.concurrency = concurrency
       end
 
