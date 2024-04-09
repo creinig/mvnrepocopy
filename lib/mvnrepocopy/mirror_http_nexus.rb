@@ -1,7 +1,7 @@
-require_relative 'scan_http'
+require_relative 'mirror_http'
 
 module Mvnrepocopy
-  class ScanHttpNexus < ScanHttp
+  class MirrorHttpNexus < MirrorHttp
     def initialize(url, reponame, concurrency, verbose)
       @browseurl = "#{url.sub(%r{/+$}, '')}/service/rest/repository/browse/#{reponame}"
       @downloadurl = "#{url.sub(%r{/+$}, '')}/repository/#{reponame}"

@@ -8,12 +8,10 @@ require 'nokogiri'
 require 'mvnrepocopy/storage'
 
 module Mvnrepocopy
-  class ScanHttp
+  class MirrorHttp
     def initialize(baseurl, concurrency, verbose)
       @baseurl = baseurl
       @verbose = verbose
-      @barrier = Async::Barrier.new
-      @semaphore = Async::Semaphore.new(concurrency, parent: @barrier)
       @storage = Storage.instance
       @log = @storage
     end
@@ -22,17 +20,28 @@ module Mvnrepocopy
     #
     # returns:: the list of download URLs found
     def scan_recursive()
-      urls = []
-      Sync do
-        urls = @semaphore.async do
-          scan(@baseurl)
-        end.wait
-      ensure
-        @barrier.stop
-      end
+      Sync do 
+        urls = scan(@baseurl)
 
-      # only return download URLs
-      urls.reject{|u| is_index?(u)}
+        # only return download URLs
+        urls.reject{|u| is_index?(u)}
+      end
+    end
+
+    # Download all files represented by the given array of URLs
+    def download_files(urls)
+      barrier = Async::Barrier.new
+      semaphore = Async::Semaphore.new(concurrency, parent: barrier)
+
+      Sync do
+        urls.map do |url|
+          semaphore.async do
+            download(url)
+          end
+        end.map(&:wait)
+      ensure
+        barrier.stop
+      end
     end
 
     protected #---------------------
@@ -54,7 +63,7 @@ module Mvnrepocopy
     # returns:: the list of found download URLs 
     def scan(url)
       internet = Async::HTTP::Internet.instance
-      scanned = []
+      download_urls = []
 
       begin
         @log.debug "Request to #{url}"
@@ -68,21 +77,20 @@ module Mvnrepocopy
 
         if((response.status == 200) && response.headers['content-type']&.include?("html"))
           relative_links = extract_links(response.read, url)
-          relative_links.each do |url|
+
+          download_urls = relative_links.map do |url|
             if(is_index?(url)) 
-              @semaphore.async do
-                scan(url)
-              end.wait.each {|link| scanned << link}
+              scan(url)
             else
-              scanned << url
+              [url]
             end
-          end
+          end.flatten
         else
           @log.error "  Response for #{url}: #{response.status}"
         end
       end
 
-      scanned
+      download_urls
     end
 
     def is_redirect?(response)

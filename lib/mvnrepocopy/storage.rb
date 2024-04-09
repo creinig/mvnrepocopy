@@ -36,6 +36,15 @@ module Mvnrepocopy
       log2file "ERROR #{msg}"
     end
 
+    def mkdirs_for(file)
+      dir = mkdirs(File.dirname(file.to_s))
+      File.join(dir, File.basename(file.to_s))
+    end
+
+    def mkdirs(*path_parts)
+      dir @basedir, *path_parts
+    end
+
     private #----------------------------------
 
     def log2file(msg)
