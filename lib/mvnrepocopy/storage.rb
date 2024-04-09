@@ -1,19 +1,25 @@
+require 'fileutils'
+
 module Mvnrepocopy
   class Storage
     include Singleton
 
     def setup(reponame, operation, verbose)
       @reponame = reponame
-      @oeration = operation
+      @operation = operation.to_s
       @verbose = verbose
       @starttime = Time.new
       @starttime_str = @starttime.strftime('%Y-%m-%d_%H:%M:%S')
 
-      freeze
+      Dir.mkdir('work') unless Dir.exist?('work')
+      @basedir = Dir.new("work")
+
+      ObjectSpace.define_finalizer(self, self.class.create_finalizer(logfile()))
     end
 
     def debug(msg)
       puts msg if @verbose
+      log2file "DEBUG #{msg}"
     end
 
     def debug?()
@@ -22,10 +28,36 @@ module Mvnrepocopy
 
     def info(msg)
       puts msg
+      log2file "INFO  #{msg}"
     end
 
     def error(msg)
       puts "ERROR ", msg
+      log2file "ERROR #{msg}"
+    end
+
+    private #----------------------------------
+
+    def log2file(msg)
+      timestamp = Time.now.strftime('%Y-%m-%d_%H:%M:%S')
+
+      logfile().puts "#{timestamp} #{msg}"
+    end
+
+    def logfile()
+      @logfile ||= File.new(File.join(dir(@basedir, @operation, "log"), "#{@starttime_str}.log"), 'a')
+    end
+
+    def dir(*parts)
+      name = File.join(*parts)
+      FileUtils.mkdir_p(name)
+      Dir.new(name)
+    end
+
+    def self.create_finalizer(logfile)
+      proc {
+        logfile.close if logfile
+      }
     end
   end
 end
