@@ -22,14 +22,4 @@ pp download_urls if Storage.instance.debug?
 log.info "Downloading files"
 mirror.download_files(download_urls)
 
-# DONE: async PoC w/ HTTP requests
-# DONE: local workdir mgmt
-# DONE: HTML link parsing
-# TODO: download tasks
-# TODO: progress output
-# DONE: error & status logging & persisting
-# XXX: config file, global config object?
-# TODO: support for incremental downloads
-
-
 

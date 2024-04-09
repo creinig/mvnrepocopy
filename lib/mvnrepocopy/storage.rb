@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'singleton'
 
 module Mvnrepocopy
   class Storage
@@ -35,7 +36,7 @@ module Mvnrepocopy
     end
 
     def error(msg)
-      puts "ERROR ", msg
+      puts "ERROR #{msg}"
       log2file "ERROR #{msg}"
     end
 
@@ -54,6 +55,11 @@ module Mvnrepocopy
       fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
       File.open(fullname, 'w') {|f| f.puts(lines) }
+    end
+
+    # Get the repo directory
+    def repodir()
+      dir(target_dir(:repo))
     end
 
     # create all directories for the given file, relative to the local repo

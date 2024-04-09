@@ -3,12 +3,10 @@ require_relative 'config'
 
 module Mvnrepocopy
 
-  # Commandline parser for the export.nexus.rb command
-  class ExportNexusConfig < Config
+  # Commandline parser for the upload.maven.rb command
+  class UploadMavenConfig < Config
     def add_specific_options(opts, options)
-      options.cache = false
-
-      opts.on("--url=URL", "Base URL of the source nexus") do |url|
+      opts.on("--url=URL", "Base URL of the target maven repo") do |url|
         options.url = url
       end
 
@@ -16,8 +14,8 @@ module Mvnrepocopy
         options.repo = repo
       end
 
-      opts.on('-c', '--[no-]cache', "Use cached list of URLs etc if present") do |v|
-        options.cache = v
+      opts.on("--server=SERVER", "ID of the target maven server, as defined in settingx.xml") do |server|
+        options.server = server
       end
     end
 
@@ -29,7 +27,12 @@ module Mvnrepocopy
       unless (options.repo) && (options.repo.length > 2)
         error optparser, "'repo' option missing or empty"
       end
+
+      unless (options.server) && (options.server.length > 2)
+        error optparser, "'server' option missing or empty"
+      end
     end
   end
 end
+
 
