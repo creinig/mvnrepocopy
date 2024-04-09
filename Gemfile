@@ -23,3 +23,5 @@ gem "thread-local", "~> 1.1"
 gem "nokogiri", "~> 1.16"
 
 gem "rchardet", "~> 1.8"
+
+gem "httpclient", "~> 2.8"
