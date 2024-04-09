@@ -89,7 +89,7 @@ module Mvnrepocopy
 
     def read_file(file)
       if(file.end_with?(".pom"))
-        @sanitize_pom.sanitize_pom(IO.read(file))
+        @sanitize_pom.sanitize_pom(file, IO.read(file))
       else
         IO.read(file)
       end
