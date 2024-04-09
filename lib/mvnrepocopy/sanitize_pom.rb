@@ -8,40 +8,12 @@ module Mvnrepocopy
   # with certain constructs in POM files => we automatically remove these
   # to be sure
   class SanitizePom
-    def initialize(reponame)
-      @reponame = reponame
-      @storage = Storage.instance
-      @log = @storage
-    end
-
-    def sanitize_poms_in_repo
-      poms = find_poms
-      progress = Progress.new(poms.length)
-
-      poms.each do |pom|
-        sanitize(pom)
-        progress.inc
-      end
+    def sanitize_pom(contents)
+      contents = fix_encoding(contents)
+      contents.gsub(%r{<packaging>pom</packaging>}, '')
     end
 
     private #------------------------
-
-    def sanitize(pom)
-      begin
-        contents = IO.read(pom)
-        contents = fix_encoding(contents)
-        contents.gsub! %r{<packaging>pom</packaging>}, ''
-        IO.write(pom, contents, external_encoding: 'UTF-8')
-      rescue 
-        @log.error "Failed sanitizing '#{pom}'"
-        raise
-      end
-    end
-
-    def find_poms()
-      Dir.glob('**/*.pom', base: @storage.repodir.path)
-        .map{|f| File.join(@storage.repodir.path, f)}
-    end
 
     # POMs may be in different encodings. Using the wrong one will trip up gsub() & co
     def fix_encoding(str)

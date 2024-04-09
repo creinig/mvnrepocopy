@@ -14,8 +14,16 @@ module Mvnrepocopy
         options.repo = repo
       end
 
-      opts.on("--server=SERVER", "ID of the target maven server, as defined in settingx.xml") do |server|
-        options.server = server
+      opts.on("-uU", "--user=USERNAME", "Username for the target maven repository") do |user|
+        options.user = user
+      end
+
+      opts.on("-pP", "--pass=USERNAME", "Password for the target maven repository") do |pass|
+        options.pass = pass
+      end
+
+      opts.on("-n", '--[no-]dry-run', 'Do not actually upload anything') do |dry|
+        options.dry_run = dry
       end
 
       opts.on("--filter=REGEX", "Only upload packages matching this regular expression") do |regex|
@@ -30,10 +38,6 @@ module Mvnrepocopy
 
       unless (options.repo) && (options.repo.length > 2)
         error optparser, "'repo' option missing or empty"
-      end
-
-      unless (options.server) && (options.server.length > 2)
-        error optparser, "'server' option missing or empty"
       end
     end
   end
