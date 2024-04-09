@@ -14,7 +14,7 @@ log = Storage.instance
 log.setup(options.repo, :upload_maven, options.verbose)
 log.info "Detailed information will be written to #{log.logfile_name}"
 
-log.info "Sanitizing al POMs for potentially picky target repository software"
+log.info "Sanitizing all POMs for potentially picky target repository software"
 SanitizePom.new(options.repo).sanitize_poms_in_repo
 
 log.info "Uploading packages"
