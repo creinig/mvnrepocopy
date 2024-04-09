@@ -36,8 +36,11 @@ module Mvnrepocopy
       log2file "ERROR #{msg}"
     end
 
+    # create all directories for the given file, relative to the local repo
+    #
+    # returns:: the qualified path pointing to the file
     def mkdirs_for(file)
-      dir = mkdirs(File.dirname(file.to_s))
+      dir = mkdirs('repos', @reponame, File.dirname(file.to_s))
       File.join(dir, File.basename(file.to_s))
     end
 
@@ -54,7 +57,7 @@ module Mvnrepocopy
     end
 
     def logfile()
-      @logfile ||= File.new(File.join(dir(@basedir, @operation, "log"), "#{@starttime_str}.log"), 'a')
+      @logfile ||= File.new(File.join(dir(@basedir, @operation, "log"), "#{@reponame}-#{@starttime_str}.log"), 'a')
     end
 
     def dir(*parts)

@@ -19,5 +19,9 @@ module Mvnrepocopy
 
       nil
     end
+
+    def to_repopath(url)
+      url.delete_prefix(@downloadurl)
+    end
   end
 end

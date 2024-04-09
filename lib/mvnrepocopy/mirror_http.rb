@@ -12,6 +12,7 @@ module Mvnrepocopy
     def initialize(baseurl, concurrency, verbose)
       @baseurl = baseurl
       @verbose = verbose
+      @concurrency = concurrency
       @storage = Storage.instance
       @log = @storage
     end
@@ -31,7 +32,7 @@ module Mvnrepocopy
     # Download all files represented by the given array of URLs
     def download_files(urls)
       barrier = Async::Barrier.new
-      semaphore = Async::Semaphore.new(concurrency, parent: barrier)
+      semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
 
       Sync do
         urls.map do |url|
@@ -56,14 +57,17 @@ module Mvnrepocopy
       link.end_with?("/")
     end
 
+    # Convert the given URL to a path relative to the repo
+    def to_repopath(url)
+      url.delete_prefix(@baseurl)
+    end
+
     private # ----------------
 
     # Fetch the given URL, parse the response and recursively scan all relative links in the response HTML
     #
     # returns:: the list of found download URLs 
     def scan(url)
-      download_urls = []
-
       request(url) do |url, response|
         if(response.headers['content-type']&.include?("html"))
           relative_links = extract_links(response.read, url)
@@ -94,6 +98,19 @@ module Mvnrepocopy
       refs
         .map {|path| sanitize_link(path, url)}
         .select {|path| path}
+    end
+
+    def download(url)
+      localpath = to_repopath(url)
+
+      request(url) do |url, response|
+        localfile = @storage.mkdirs_for(localpath)
+        response.save(localfile)
+        puts "Downloaded #{url} to #{localfile}"
+      rescue => e
+        pp e
+        exit
+      end
     end
 
     def request(url, &success_handler)
