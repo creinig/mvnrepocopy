@@ -44,7 +44,7 @@ module Mvnrepocopy
 
       http = HTTPClient.new(:force_basic_auth => true)
       http.set_auth(nil, @user, @passwd) if(@user && @passwd)
-      http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE 
+      http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.keep_alive_timeout=60
 
       Sync do
@@ -83,8 +83,8 @@ module Mvnrepocopy
 
     def find_package_dirs()
       Dir.glob("**/*.pom", base: @storage.repodir.path)
-        .select{|f| !@filter_regex or f.match(@filter_regex)}
-        .map{|f| File.join(@storage.repodir.path, File.dirname(f))}
+        .select { |f| !@filter_regex or f.match(@filter_regex) }
+        .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
     end
 
     def read_file(file)
@@ -114,7 +114,7 @@ module Mvnrepocopy
     end
 
     def is_text_type?(content_type)
-      content_type && ! ["text/", "/json", "/xml"].select{|part| content_type.include? part }.empty?
+      content_type && ! ["text/", "/json", "/xml"].select { |part| content_type.include? part }.empty?
     end
 
     def exists_on_server?(path, http)

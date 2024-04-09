@@ -47,7 +47,7 @@ module Mvnrepocopy
 
     # Download all files represented by the given array of URLs
     def download_files(urls)
-      urls = urls.select{|u| u.match? @filter} if @filter
+      urls = urls.select { |u| u.match? @filter } if @filter
 
       barrier = Async::Barrier.new
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
@@ -112,8 +112,8 @@ module Mvnrepocopy
           end
         end.map(&:wait).flatten
 
-        index_urls = new_links.select{|l| is_index?(l)}
-        download_urls.concat(new_links.select{|l| not is_index?(l)})
+        index_urls = new_links.select { |l| is_index?(l) }
+        download_urls.concat(new_links.select { |l| not is_index?(l) })
       end
 
       download_urls
@@ -121,12 +121,12 @@ module Mvnrepocopy
 
     def extract_links(html, url)
       doc = Nokogiri(html)
-      refs = doc.xpath("//a/@href").to_a.map{|a| a.value}
+      refs = doc.xpath("//a/@href").to_a.map { |a| a.value }
 
       #pp refs if @log.debug?
       refs
-        .map {|path| sanitize_link(path, url)}
-        .select {|path| path}
+        .map { |path| sanitize_link(path, url) }
+        .select { |path| path }
     end
 
     def download(url)
