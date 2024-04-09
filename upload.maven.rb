@@ -13,6 +13,6 @@ log = Storage.instance
 log.setup(options.repo, :upload_maven, options.verbose)
 log.info "Detailed information will be written to #{log.logfile_name}"
 
-upload = UploadMaven.new(options.url, options.repo, options.server, options.concurrency)
+upload = UploadMaven.new(options.url, options.repo, options.server, options.concurrency, options.filter)
 upload.upload()
 

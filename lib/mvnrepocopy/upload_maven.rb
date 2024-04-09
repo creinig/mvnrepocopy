@@ -8,11 +8,12 @@ require 'mvnrepocopy/progress'
 
 module Mvnrepocopy
   class UploadMaven
-    def initialize(url, reponame, server, concurrency)
+    def initialize(url, reponame, server, concurrency, filter)
       @url = url
       @reponame = reponame
       @server = server
       @concurrency = concurrency
+      @filter_regex = filter ? Regexp.new(filter) : nil
       @storage = Storage.instance
       @log = @storage
     end
@@ -69,6 +70,7 @@ module Mvnrepocopy
       Dir.glob('**/*.jar', base: @storage.repodir.path)
         .select{|f| not (f.end_with?('-sources.jar') || f.end_with?('-javadoc.jar'))}
         .map{|f| File.join(@storage.repodir.path, f)}
+        .select{|f| !@filter_regex or f.match(@filter_regex)}
     end
 
     def find_pom(jarfile)
@@ -80,11 +82,11 @@ module Mvnrepocopy
     end
 
     def mvn_deploy_file(opts)
-      cmdline = ['mvn', 'deploy:deploy-file']
-      cmdline.concat(opts)
+      cmdline = ['mvn', 'deploy:deploy-file'].concat(opts).join(' ')
 
+      @log.debug "Running #{cmdline}"
       #output, status = cmdline.to_s, 0
-      output, status = Open3.capture2e(cmdline.join(' '))
+      output, status = Open3.capture2e(cmdline)
 
       @log.debug output
       status

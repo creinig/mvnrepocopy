@@ -17,6 +17,10 @@ module Mvnrepocopy
       opts.on("--server=SERVER", "ID of the target maven server, as defined in settingx.xml") do |server|
         options.server = server
       end
+
+      opts.on("--filter=REGEX", "Only upload packages matching this regular expression") do |regex|
+        options.filter = regex
+      end
     end
 
     def validate(optparser, options)
