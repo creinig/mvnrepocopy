@@ -30,6 +30,9 @@ module Mvnrepocopy
           semaphore.async do
             upload_file(file)
             progress.inc
+          rescue => e
+            @log.error "Error uploading '#{file}': #{e}"
+            raise
           end
         end.map(&:wait)
       ensure
@@ -48,10 +51,12 @@ module Mvnrepocopy
 
       src_jar = file.sub(/\.jar$/, '-sources.jar')
       doc_jar = file.sub(/\.jar$/, '-javadoc.jar')
+      allinone_jar = file.sub(/\.jar$/, '-allinone.jar')
 
       opts = ["-DpomFile=#{pom}", "-Dfile=#{file}", "-DrepositoryId=#{@server}", "-Durl=#{@url}"]
       opts << "-Dsources=#{src_jar}" if File.exist?(src_jar)
       opts << "-Djavadoc=#{doc_jar}" if File.exist?(doc_jar)
+      opts << "-Dfiles=#{allinone_jar}" if File.exist?(allinone_jar)
 
       status = mvn_deploy_file(opts)
 
@@ -59,6 +64,7 @@ module Mvnrepocopy
         extras = []
         extras << "#{File.basename src_jar}" if File.exist?(src_jar)
         extras << "#{File.basename doc_jar}" if File.exist?(doc_jar)
+        extras << "#{File.basename allinone_jar}" if File.exist?(allinone_jar)
 
         @log.debug "Uploaded #{file} with #{extras}"
       else
@@ -68,7 +74,7 @@ module Mvnrepocopy
 
     def find_jars()
       Dir.glob('**/*.jar', base: @storage.repodir.path)
-        .select{|f| not (f.end_with?('-sources.jar') || f.end_with?('-javadoc.jar'))}
+        .reject{|f| special_jar?(f)}
         .map{|f| File.join(@storage.repodir.path, f)}
         .select{|f| !@filter_regex or f.match(@filter_regex)}
     end
@@ -78,7 +84,8 @@ module Mvnrepocopy
 
       return pom if File.exist?(pom)
       dir = File.dirname(jarfile)
-      File.join(dir, Dir.glob("*.pom", base: dir).first)
+      filename = Dir.glob("*.pom", base: dir).first
+      filename && File.join(dir, filename)
     end
 
     def mvn_deploy_file(opts)
@@ -90,6 +97,10 @@ module Mvnrepocopy
 
       @log.debug output
       status
+    end
+
+    def special_jar?(name)
+      not ['-sources.jar', '-javadoc.jar', '-allinone.jar'].select{|suffix| name.end_with?(suffix)}.empty?
     end
   end
 end
