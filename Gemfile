@@ -19,3 +19,5 @@ gem "pry", "~> 0.14.2"
 gem "async-http", "~> 0.63.0"
 
 gem "thread-local", "~> 1.1"
+
+gem "nokogiri", "~> 1.16"

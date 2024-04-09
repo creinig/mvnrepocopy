@@ -1,23 +1,18 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'pp'
-require 'async'
-require 'async/barrier'
-require 'async/semaphore'
-require 'async/http/internet/instance'
 
 require 'mvnrepocopy/export_nexus_config'
-require 'mvnrepocopy/scan_http'
+require 'mvnrepocopy/scan_http_nexus'
 
 options = Mvnrepocopy::ExportNexusConfig.new.parse(ARGV)
 
 
-baseurl = "#{options.url.sub(%r{/+$}, '')}/service/rest/repository/browse/#{options.repo}"
-scanner = Mvnrepocopy::ScanHttp.new(options.concurrency, options.verbose)
-scanner.scan_recursive(baseurl)
+scanner = Mvnrepocopy::ScanHttpNexus.new(options.url, options.repo, options.concurrency, options.verbose)
+download_urls = scanner.scan_recursive()
 
-# TODO: async PoC w/ HTTP requests
+pp download_urls
+# DONE: async PoC w/ HTTP requests
 # TODO: local workdir mgmt
 # TODO: HTML link parsing
 # TODO: download tasks
