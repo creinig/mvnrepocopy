@@ -11,6 +11,16 @@ require 'mvnrepocopy/progress'
 require 'mvnrepocopy/sanitize_pom'
 
 module Mvnrepocopy
+  # Upload a local maven repository to a remote one.
+  #
+  # This emulates the "mvn deploy:deploy-file" task by uploading the files via
+  # HTTP PUT, since maven tends to hide the actual error responses, making it *very*
+  # hard to diagnose upload problems.
+  #
+  # To further improve this, the code performs a HEAD request before uploading each file.
+  # This allows for distinguishing between "file already exists" and "some other conflict"
+  # (e.g. a version conflict with a proxied upstream repo).
+  #
   class UploadMaven
     def initialize(url, server, concurrency, filter, user: nil, passwd: nil, dry_run: false)
       @url = url
@@ -23,8 +33,6 @@ module Mvnrepocopy
       @storage = Storage.instance
       @log = @storage
       @sanitize_pom = SanitizePom.new
-
-      @basic_headers = (user && passwd) ? [['Authorization', "Basic #{basic_auth(user, passwd)}"]] : []
     end
 
     def upload()
@@ -37,6 +45,7 @@ module Mvnrepocopy
       http = HTTPClient.new(:force_basic_auth => true)
       http.set_auth(nil, @user, @passwd) if(@user && @passwd)
       http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE 
+      http.keep_alive_timeout=60
 
       Sync do
         package_dirs.map do |dir|
@@ -119,10 +128,6 @@ module Mvnrepocopy
 
     def remotepath(localpath)
       localpath.delete_prefix(@storage.repodir.path)
-    end
-
-    def basic_auth(user, passwd)
-      Base64.strict_encode64("#{user}:#{passwd}")
     end
   end
 end
