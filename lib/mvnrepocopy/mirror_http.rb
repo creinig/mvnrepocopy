@@ -6,6 +6,7 @@ require 'async/http/internet/instance'
 require 'nokogiri'
 
 require 'mvnrepocopy/storage'
+require 'mvnrepocopy/progress'
 
 module Mvnrepocopy
   class MirrorHttp
@@ -47,11 +48,13 @@ module Mvnrepocopy
     def download_files(urls)
       barrier = Async::Barrier.new
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
+      progress = Progress.new(urls.length)
 
       Sync do
         urls.map do |url|
           semaphore.async do
             download(url)
+            progress.inc
           end
         end.map(&:wait)
       ensure
@@ -120,7 +123,7 @@ module Mvnrepocopy
       request(url) do |url, response|
         localfile = @storage.mkdirs_for(localpath)
         response.save(localfile)
-        puts "Downloaded #{url} to #{localfile}"
+        @log.debug "Downloaded #{url} to #{localfile}"
       rescue => e
         pp e
         exit

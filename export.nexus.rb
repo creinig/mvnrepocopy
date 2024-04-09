@@ -19,6 +19,7 @@ download_urls = mirror.scan_recursive()
 log.info "Found #{download_urls.length} files"
 pp download_urls if Storage.instance.debug?
 
+log.info "Downloading files"
 mirror.download_files(download_urls)
 
 # DONE: async PoC w/ HTTP requests
