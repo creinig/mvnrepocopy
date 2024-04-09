@@ -4,6 +4,9 @@ module Mvnrepocopy
   class Storage
     include Singleton
 
+    # Supported target dir structures
+    TARGETS = [:repo, :log, :cache]
+
     def setup(reponame, operation, verbose)
       @reponame = reponame
       @operation = operation.to_s
@@ -40,16 +43,28 @@ module Mvnrepocopy
       logfile().path
     end
 
+    # get all lines in the specified cache file
+    def read_cache(name)
+      fullname = mkdirs_for(name, :cache)
+
+      File.exist?(fullname) ? File.open(fullname, 'r') {|f| f.readlines(chomp: true)} : []
+    end
+
+    def write_cache(name, lines)
+      fullname = mkdirs_for(name, :cache)
+
+      File.open(fullname, 'w') {|f| f.puts(lines) }
+    end
+
     # create all directories for the given file, relative to the local repo
     #
     # returns:: the qualified path pointing to the file
-    def mkdirs_for(file)
-      dir = mkdirs('repos', @reponame, File.dirname(file.to_s))
-      File.join(dir, File.basename(file.to_s))
-    end
+    def mkdirs_for(file, target = :repo)
+      dirname = File.dirname(file.to_s)
+      dirname = '' if dirname == '.'
+      dir = dir(target_dir(target), dirname)
 
-    def mkdirs(*path_parts)
-      dir @basedir, *path_parts
+      File.join(dir, File.basename(file.to_s))
     end
 
     private #----------------------------------
@@ -61,7 +76,7 @@ module Mvnrepocopy
     end
 
     def logfile()
-      @logfile ||= File.new(File.join(dir(@basedir, @operation, "log"), "#{@reponame}-#{@starttime_str}.log"), 'a')
+      @logfile ||= File.new(mkdirs_for("#{@reponame}-#{@starttime_str}.log", :log), 'a')
     end
 
     def dir(*parts)
@@ -74,6 +89,19 @@ module Mvnrepocopy
       proc {
         logfile.close if logfile
       }
+    end
+
+    def target_dir(target)
+      case target
+      when :repo
+        File.join(@basedir, 'repos', @reponame)
+      when :log
+        File.join(@basedir, @operation, 'log')
+      when :cache
+        File.join(@basedir, @operation, 'cache')
+      else
+        raise ArgumentError, "Unsupported target #{target}", caller
+      end
     end
   end
 end

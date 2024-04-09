@@ -9,9 +9,10 @@ require 'mvnrepocopy/storage'
 
 module Mvnrepocopy
   class MirrorHttp
-    def initialize(baseurl, concurrency, verbose)
+    def initialize(baseurl, concurrency, verbose, cache)
       @baseurl = baseurl
       @verbose = verbose
+      @cache = cache
       @concurrency = concurrency
       @storage = Storage.instance
       @log = @storage
@@ -21,11 +22,24 @@ module Mvnrepocopy
     #
     # returns:: the list of download URLs found
     def scan_recursive()
+      if(@cache) 
+        urls = @storage.read_cache('download_urls')
+
+        if(urls && !urls.empty?)
+          @log.info "Download URLs read from cache file"
+          return urls
+        end
+      end
+
+      @log.info "Scanning for download links in repo #{@baseurl}"
       Sync do 
         urls = scan(@baseurl)
 
         # only return download URLs
         urls.reject{|u| is_index?(u)}
+
+        @storage.write_cache('download_urls', urls)
+        urls
       end
     end
 

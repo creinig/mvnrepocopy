@@ -9,6 +9,7 @@ module Mvnrepocopy
       options = OpenStruct.new
       options.concurrency = 1
       options.verbose = false
+      options.cache = false
 
       parser = OptionParser.new do |opts|
         opts.banner = "usage: #{$0} [options]"
@@ -48,6 +49,10 @@ module Mvnrepocopy
 
       opts.on("-jN", "--concurrency=N", Integer,  "Maximum number of concurrent requests") do |concurrency|
         options.concurrency = concurrency
+      end
+
+      opts.on('-c', '--[no-]cache', "Use cached list of URLs etc if present") do |v|
+        options.cache = v
       end
 
       opts.on("-v", "--[no-]verbose", "Print verbose output") do |v|
