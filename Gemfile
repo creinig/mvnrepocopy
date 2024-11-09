@@ -13,3 +13,5 @@ gem "pry", "~> 0.14.2"
 gem "rake", "~> 13.0"
 gem "rchardet", "~> 1.8"
 gem "standard", ">= 1.35.1"
+
+gem "ostruct", "~> 0.6.1"

@@ -31,6 +31,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.2-x86_64-linux)
       racc (~> 1.4)
+    ostruct (0.6.1)
     parallel (1.26.3)
     parser (3.3.6.0)
       ast (~> 2.4.1)
@@ -84,6 +85,7 @@ DEPENDENCIES
   minitest (~> 5.0)
   mvnrepocopy!
   nokogiri (~> 1.16)
+  ostruct (~> 0.6.1)
   pry (~> 0.14.2)
   rake (~> 13.0)
   rchardet (~> 1.8)
