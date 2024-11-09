@@ -26,11 +26,11 @@ module Mvnrepocopy
     end
 
     def validate(optparser, options)
-      unless (options.url&.start_with?(%r_https?://_))
+      unless options.url&.start_with?(%r{https?://})
         error optparser, "'url' option missing or not an HTTP(s) URL"
       end
 
-      unless (options.repo) && (options.repo.length > 2)
+      unless options.repo && (options.repo.length > 2)
         error optparser, "'repo' option missing or empty"
       end
     end

@@ -27,11 +27,11 @@ module Mvnrepocopy
     # Fetch the given repository index, parse the response and recursively scan all relative links
     #
     # returns:: the list of download URLs found
-    def scan_recursive()
-      if (@cache)
+    def scan_recursive
+      if @cache
         urls = @storage.read_cache("download_urls")
 
-        if (urls && !urls.empty?)
+        if urls && !urls.empty?
           @log.info "Download URLs read from cache file"
           return urls
         end
@@ -95,12 +95,12 @@ module Mvnrepocopy
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
       progress = Progress.new
 
-      while !index_urls.empty?
+      until index_urls.empty?
         new_links = index_urls.map do |index|
           semaphore.async do
             progress.inc
 
-            response = @http.get(index, :follow_redirect => true)
+            response = @http.get(index, follow_redirect: true)
             if response.status_code != 200
               @log.error "Error reading index page '#{index}': status #{response.status_code}"
               next
@@ -113,7 +113,7 @@ module Mvnrepocopy
         end.map(&:wait).flatten
 
         index_urls = new_links.select { |l| is_index?(l) }
-        download_urls.concat(new_links.select { |l| not is_index?(l) })
+        download_urls.concat(new_links.select { |l| !is_index?(l) })
       end
 
       download_urls
@@ -132,14 +132,14 @@ module Mvnrepocopy
     def download(url)
       localfile = @storage.mkdirs_for(to_repopath(url))
 
-      if (File.exist?(localfile))
+      if File.exist?(localfile)
         @log.debug "Skipping #{url} - already exists locally"
         return
       end
 
       return if @dry_run
 
-      response = @http.get(url, :follow_redirect => true)
+      response = @http.get(url, follow_redirect: true)
       if response.status_code != 200
         @log.error "Error downloading file '#{url}': status #{response.status_code}"
       else

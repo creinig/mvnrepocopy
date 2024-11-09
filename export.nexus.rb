@@ -14,7 +14,7 @@ log.setup(options.repo, :export_nexus, options.verbose)
 log.info "Detailed information will be written to #{log.logfile_name}"
 
 mirror = MirrorHttpNexus.new(options.url, options.repo, options.concurrency, options.cache, dry_run: options.dry_run,
-                                                                                            filter: options.filter)
+  filter: options.filter)
 download_urls = mirror.scan_recursive
 
 log.info "Found #{download_urls.length} files"

@@ -50,7 +50,7 @@ module Mvnrepocopy
         options.filter = regex
       end
 
-      opts.on("-n", '--[no-]dry-run', 'Do not actually upload anything') do |dry|
+      opts.on("-n", "--[no-]dry-run", "Do not actually upload anything") do |dry|
         options.dry_run = dry
       end
 

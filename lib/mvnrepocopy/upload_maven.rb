@@ -35,15 +35,15 @@ module Mvnrepocopy
       @sanitize_pom = SanitizePom.new
     end
 
-    def upload()
+    def upload
       package_dirs = find_package_dirs
 
       barrier = Async::Barrier.new
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
       progress = Progress.new(package_dirs.length, 20)
 
-      http = HTTPClient.new(:force_basic_auth => true)
-      http.set_auth(nil, @user, @passwd) if (@user && @passwd)
+      http = HTTPClient.new(force_basic_auth: true)
+      http.set_auth(nil, @user, @passwd) if @user && @passwd
       http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.keep_alive_timeout = 60
 
@@ -65,7 +65,7 @@ module Mvnrepocopy
     private #------------------------------------
 
     def upload_dir(dir, http)
-      files = Dir.glob(File.join(dir, '*.pom')).concat(Dir.glob(File.join(dir, '*.jar')))
+      files = Dir.glob(File.join(dir, "*.pom")).concat(Dir.glob(File.join(dir, "*.jar")))
 
       files.each do |file|
         if exists_on_server?(file, http)
@@ -81,14 +81,14 @@ module Mvnrepocopy
       end
     end
 
-    def find_package_dirs()
+    def find_package_dirs
       Dir.glob("**/*.pom", base: @storage.repodir.path)
-         .select { |f| !@filter_regex or f.match(@filter_regex) }
-         .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
+        .select { |f| !@filter_regex or f.match(@filter_regex) }
+        .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
     end
 
     def read_file(file)
-      if (file.end_with?(".pom"))
+      if file.end_with?(".pom")
         @sanitize_pom.sanitize_pom(file, IO.read(file))
       else
         IO.read(file)
@@ -98,14 +98,14 @@ module Mvnrepocopy
     def upload_file(path, contents, http)
       url = "#{@url}/#{remotepath(path)}"
 
-      response = http.put(url, :body => contents)
+      response = http.put(url, body: contents)
 
       case response.status_code
       in (200..299)
         @log.debug "Uploaded #{path}"
       else
         @log.error "Upload of #{path} failed with status #{response.status_code}"
-        if (is_text_type?(response.content_type))
+        if is_text_type?(response.content_type)
           @log.debug "Error response fron #{path}: #{response.body}"
         end
       end

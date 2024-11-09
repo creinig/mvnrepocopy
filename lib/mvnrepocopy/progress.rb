@@ -9,8 +9,8 @@ module Mvnrepocopy
     def inc
       @current += 1
 
-      if ((@current % @print_interval == 0) || (@current == @total_steps))
-        puts "Progress: #{@current} of #{@total_steps || 'unknown'}"
+      if (@current % @print_interval == 0) || (@current == @total_steps)
+        puts "Progress: #{@current} of #{@total_steps || "unknown"}"
       end
     end
   end

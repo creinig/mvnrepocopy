@@ -1,5 +1,5 @@
-require 'nokogiri'
-require 'rchardet'
+require "nokogiri"
+require "rchardet"
 
 module Mvnrepocopy
   # Some maven repositories *cough*AzDO*cough* seem to have serious problems

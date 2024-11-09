@@ -18,7 +18,7 @@ module Mvnrepocopy
       Dir.mkdir("work") unless Dir.exist?("work")
       @basedir = Dir.new("work")
 
-      ObjectSpace.define_finalizer(self, self.class.create_finalizer(logfile()))
+      ObjectSpace.define_finalizer(self, self.class.create_finalizer(logfile))
     end
 
     def debug(msg)
@@ -26,7 +26,7 @@ module Mvnrepocopy
       log2file "DEBUG #{msg}"
     end
 
-    def debug?()
+    def debug?
       @verbose
     end
 
@@ -40,25 +40,25 @@ module Mvnrepocopy
       log2file "ERROR #{msg}"
     end
 
-    def logfile_name()
-      logfile().path
+    def logfile_name
+      logfile.path
     end
 
     # get all lines in the specified cache file
     def read_cache(name)
       fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
-      File.exist?(fullname) ? File.open(fullname, 'r') { |f| f.readlines(chomp: true) } : []
+      File.exist?(fullname) ? File.open(fullname, "r") { |f| f.readlines(chomp: true) } : []
     end
 
     def write_cache(name, lines)
       fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
-      File.open(fullname, 'w') { |f| f.puts(lines) }
+      File.open(fullname, "w") { |f| f.puts(lines) }
     end
 
     # Get the repo directory
-    def repodir()
+    def repodir
       dir(target_dir(:repo))
     end
 
@@ -67,7 +67,7 @@ module Mvnrepocopy
     # returns:: the qualified path pointing to the file
     def mkdirs_for(file, target = :repo)
       dirname = File.dirname(file.to_s)
-      dirname = '' if dirname == '.'
+      dirname = "" if dirname == "."
       dir = dir(target_dir(target), dirname)
 
       File.join(dir, File.basename(file.to_s))
@@ -78,10 +78,10 @@ module Mvnrepocopy
     def log2file(msg)
       timestamp = Time.now.strftime("%Y-%m-%d_%H:%M:%S")
 
-      logfile().puts "#{timestamp} #{msg}"
+      logfile.puts "#{timestamp} #{msg}"
     end
 
-    def logfile()
+    def logfile
       @logfile ||= File.new(mkdirs_for("#{@reponame}-#{@starttime_str}.log", :log), "a")
     end
 
