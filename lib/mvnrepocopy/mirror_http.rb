@@ -1,4 +1,3 @@
-require "pp"
 require "async"
 require "async/barrier"
 require "async/semaphore"

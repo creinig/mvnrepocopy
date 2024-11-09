@@ -73,6 +73,12 @@ module Mvnrepocopy
       File.join(dir, File.basename(file.to_s))
     end
 
+    def self.create_finalizer(logfile)
+      proc {
+        logfile&.close
+      }
+    end
+
     private #----------------------------------
 
     def log2file(msg)
@@ -89,12 +95,6 @@ module Mvnrepocopy
       name = File.join(*parts)
       FileUtils.mkdir_p(name)
       Dir.new(name)
-    end
-
-    def self.create_finalizer(logfile)
-      proc {
-        logfile.close if logfile
-      }
     end
 
     def target_dir(target)

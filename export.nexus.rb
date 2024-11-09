@@ -6,19 +6,17 @@ require "mvnrepocopy/export_nexus_config"
 require "mvnrepocopy/mirror_http_nexus"
 require "mvnrepocopy/storage"
 
-include Mvnrepocopy
-
-options = ExportNexusConfig.new.parse(ARGV)
-log = Storage.instance
+options = Mvnrepocopy::ExportNexusConfig.new.parse(ARGV)
+log = Mvnrepocopy::Storage.instance
 log.setup(options.repo, :export_nexus, options.verbose)
 log.info "Detailed information will be written to #{log.logfile_name}"
 
-mirror = MirrorHttpNexus.new(options.url, options.repo, options.concurrency, options.cache, dry_run: options.dry_run,
+mirror = Mvnrepocopy::MirrorHttpNexus.new(options.url, options.repo, options.concurrency, options.cache, dry_run: options.dry_run,
   filter: options.filter)
 download_urls = mirror.scan_recursive
 
 log.info "Found #{download_urls.length} files"
-pp download_urls if Storage.instance.debug?
+pp download_urls if Mvnrepocopy::Storage.instance.debug?
 
 log.info "Downloading files"
 mirror.download_files(download_urls)
