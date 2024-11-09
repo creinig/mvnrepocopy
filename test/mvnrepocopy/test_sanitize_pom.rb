@@ -27,7 +27,7 @@ module Mvnrepocopy
       end
     end
 
-    POM_JAR = + "
+    POM_JAR = "
     <project>
       <name>foo</name>
       <groupId>foo.bar</groupId>
@@ -35,8 +35,9 @@ module Mvnrepocopy
       <version>1.2.3</version>
       <packaging>jar</packaging>
     </project>
-    " +
-      POM_POM = POM_JAR.sub("<packaging>jar</packaging>", "<packaging>pom</packaging>")
+    "
+
+    POM_POM = POM_JAR.sub("<packaging>jar</packaging>", "<packaging>pom</packaging>")
     POM_DEFAULT = POM_JAR.sub("<packaging>jar</packaging>", "")
   end
 end
