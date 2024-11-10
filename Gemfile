@@ -15,3 +15,5 @@ gem "rchardet", "~> 1.8"
 gem "standard", ">= 1.35.1"
 
 gem "ostruct", "~> 0.6.1"
+
+gem "simplecov", "~> 0.22.0", group: :test, require: false

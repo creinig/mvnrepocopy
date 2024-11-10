@@ -1,3 +1,4 @@
+require "test_helper"
 require "mvnrepocopy/sanitize_pom"
 
 require "minitest"
