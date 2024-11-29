@@ -1,38 +1,41 @@
 # Mvnrepocopy
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mvnrepocopy`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Set of commandline tools for copying maven repositoriesbetween remote hosts. The workflow is designed to allow you to also merge or split repositories while you're at it.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'mvnrepocopy'
-```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install mvnrepocopy
+Dependencies are managed by [https://bundler.io](bundler), so to install everything needed you just have to run `bundle install` in this directory.
 
 ## Usage
 
-TODO: Write usage instructions here
+### export_nexus.rb
+
+`bin/export.nexus.rb` exports a maven repository from a [https://www.sonatype.com/products/sonatype-nexus-repository](nexus 3) server to the local file system.
+Since this can take a while, the script provides options for parallel transfer (`-j`)and local caching of the remote directory structure (`--cache`), and will
+not re-transfer already downloaded files (i.e. will simply resume after an aborted run). See `bin/export.nexus.rb --help` for all available options.
+
+Example usage:
+
+```bash
+bin/export.nexus.rb --url https://nexus.internal.mycompany.com/nexus --repo public -j 8 --cache
+
+bin/export.nexus.rb --url https://nexus.internal.mycompany.com/nexus --repo thirdparty -j 8 --cache --filter org/apache/commons-lang3
+```
+
+### upload.maven.rb
+
+`bin/upload.maven.rb` uploads a local maven repository to a remote maven repository. It has been tested with Azure DevOps Artifacts so far, but should work with 
+any repository using HTTP basic auth for authentication.
+
+The supported options are similar to those of `bin/export.nexus.rb` and you'll get the details by running `bin/upload.maven.rb --help`
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rake` to run style analysis and the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/mvnrepocopy.
+Bug reports and pull requests are welcome on GitHub at https://github.com/creinig/mvnrepocopy.
 
 ## License
 

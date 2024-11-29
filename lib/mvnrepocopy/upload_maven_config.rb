@@ -12,11 +12,11 @@ module Mvnrepocopy
         options.repo = repo
       end
 
-      opts.on("-uU", "--user=USERNAME", "Username for the target maven repository") do |user|
+      opts.on("-uU", "--user=USERNAME", "Username for the target maven repository (using HTTP basic auth)") do |user|
         options.user = user
       end
 
-      opts.on("-pP", "--pass=USERNAME", "Password for the target maven repository") do |pass|
+      opts.on("-pP", "--pass=USERNAME", "Password for the target maven repository (using HTTP basic auth)") do |pass|
         options.pass = pass
       end
 
