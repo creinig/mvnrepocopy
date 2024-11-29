@@ -17,3 +17,5 @@ gem "standard", ">= 1.35.1"
 gem "ostruct", "~> 0.6.1"
 
 gem "simplecov", "~> 0.22.0", group: :test, require: false
+
+gem "mutex_m", "~> 0.3.0"

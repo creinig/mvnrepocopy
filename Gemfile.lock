@@ -26,6 +26,7 @@ GEM
     method_source (1.0.0)
     mini_portile2 (2.8.7)
     minitest (5.22.2)
+    mutex_m (0.3.0)
     nio4r (2.7.0)
     nokogiri (1.16.2)
       mini_portile2 (~> 2.8.2)
@@ -93,6 +94,7 @@ DEPENDENCIES
   async (~> 1.31)
   httpclient (~> 2.8)
   minitest (~> 5.0)
+  mutex_m (~> 0.3.0)
   mvnrepocopy!
   nokogiri (~> 1.16)
   ostruct (~> 0.6.1)
