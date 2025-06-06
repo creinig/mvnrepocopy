@@ -31,7 +31,7 @@ module Mvnrepocopy
     # AzDO artifacts rejects those with a weirdly nonspecific XML parser exception
     def fix_packaging(file, contents)
       doc = Nokogiri::XML(contents, &:noblanks)
-      packaging = doc.at_css("project>packaging") || doc.at_css("project>version").add_next_sibling("<packaging>pom</packaging>").first
+      packaging = doc.at_css("project>packaging") || doc.at_css("project>artifactId").add_next_sibling("<packaging>pom</packaging>").first
       packaging.content = (contains_jar?(File.dirname(file)) ? "jar" : "pom")
 
       doc.to_xml
