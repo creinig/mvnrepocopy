@@ -54,7 +54,7 @@ module Mvnrepocopy
     def write_cache(name, lines)
       fullname = mkdirs_for("#{@reponame}.#{name}", :cache)
 
-      File.open(fullname, "w") { |f| f.puts(lines) }
+      File.open(fullname, "w") { |f| f.puts(lines.to_a) }
     end
 
     # Get the repo directory

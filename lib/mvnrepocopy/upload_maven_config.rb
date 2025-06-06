@@ -23,6 +23,10 @@ module Mvnrepocopy
       opts.on("--filter=REGEX", "Only upload packages matching this regular expression") do |regex|
         options.filter = regex
       end
+
+      opts.on("-c", "--[no-]cache", "Cache info on which packages are already present in the target repo") do |v|
+        options.cache = v
+      end
     end
 
     def validate(optparser, options)

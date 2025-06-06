@@ -22,7 +22,9 @@ module Mvnrepocopy
   # (e.g. a version conflict with a proxied upstream repo).
   #
   class UploadMaven
-    def initialize(url, server, concurrency, filter, user: nil, passwd: nil, dry_run: false)
+    CACHE_NAME = "uploaded_packages"
+
+    def initialize(url, server, concurrency, filter, cache, user: nil, passwd: nil, dry_run: false)
       @url = url
       @server = server
       @user = user
@@ -31,6 +33,7 @@ module Mvnrepocopy
       @dry_run = dry_run
       @filter_regex = filter ? Regexp.new(filter) : nil
       @storage = Storage.instance
+      @cache = cache && @storage.read_cache(CACHE_NAME).to_set
       @log = @storage
       @sanitize_pom = SanitizePom.new
     end
@@ -59,6 +62,7 @@ module Mvnrepocopy
         end.map(&:wait)
       ensure
         barrier.stop
+        @storage.write_cache(CACHE_NAME, @cache)
       end
     end
 
@@ -68,6 +72,7 @@ module Mvnrepocopy
       files = Dir.glob(File.join(dir, "*.pom")).concat(Dir.glob(File.join(dir, "*.jar")))
 
       files.each do |file|
+        @log.debug "Trying to upload '#{file}'"
         if exists_on_server?(file, http)
           @log.debug "Skipped #{file} - already exists on server"
           next
@@ -84,6 +89,7 @@ module Mvnrepocopy
     def find_package_dirs
       Dir.glob("**/*.pom", base: @storage.repodir.path)
         .select { |f| !@filter_regex or f.match(@filter_regex) }
+        .uniq
         .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
     end
 
@@ -98,11 +104,13 @@ module Mvnrepocopy
     def upload_file(path, contents, http)
       url = "#{@url}/#{remotepath(path)}"
 
+      @log.debug("  Uploading to '#{url}'")
       response = http.put(url, body: contents)
 
       case response.status_code
       in (200..299)
         @log.debug "Uploaded #{path}"
+        @cache << url
       else
         @log.error "Upload of #{path} failed with status #{response.status_code}"
         if is_text_type?(response.content_type)
@@ -120,10 +128,15 @@ module Mvnrepocopy
     def exists_on_server?(path, http)
       url = "#{@url}/#{remotepath(path)}"
 
+      return true if @cache.include? url
+
+      @log.debug("  Checking '#{url}'")
       response = http.head(url)
 
       # @log.debug "HEAD #{url} => #{status}"
-      response.status_code.to_i == 200
+      exists = response.status_code.to_i == 200
+      @cache << url if exists
+      exists
     end
 
     def remotepath(localpath)
