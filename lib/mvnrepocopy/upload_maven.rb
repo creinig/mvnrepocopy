@@ -44,15 +44,7 @@ module Mvnrepocopy
       barrier = Async::Barrier.new
       semaphore = Async::Semaphore.new(@concurrency, parent: barrier)
       progress = Progress.new(package_dirs.length, 20)
-
-      http = HTTPClient.new(force_basic_auth: true)
-      http.set_auth(nil, @user, @passwd) if @user && @passwd
-      http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.keep_alive_timeout = 60
-      http.connect_timeout = 10
-      http.send_timeout = 10
-      http.receive_timeout = 10
-      # http.debug_dev = $stderr if @log.debug?
+      http = new_http_client
 
       Sync do
         package_dirs.map do |dir|
@@ -71,6 +63,18 @@ module Mvnrepocopy
     end
 
     private #------------------------------------
+
+    def new_http_client
+      http = HTTPClient.new(force_basic_auth: true)
+      http.set_auth(nil, @user, @passwd) if @user && @passwd
+      http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.keep_alive_timeout = 60
+      http.connect_timeout = 10
+      http.send_timeout = 10
+      http.receive_timeout = 10
+      # http.debug_dev = $stderr if @log.debug?
+      http
+    end
 
     def upload_dir(dir, http)
       files = Dir.glob(File.join(dir, "*.pom")).concat(Dir.glob(File.join(dir, "*.jar")))
@@ -93,8 +97,9 @@ module Mvnrepocopy
     def find_package_dirs
       Dir.glob("**/*.pom", base: @storage.repodir.path)
         .select { |f| !@filter_regex or f.match(@filter_regex) }
-        .uniq
         .map { |f| File.join(@storage.repodir.path, File.dirname(f)) }
+        .sort
+        .uniq
     end
 
     def read_file(file)
