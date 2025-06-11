@@ -2,7 +2,7 @@ require "async"
 require "async/barrier"
 require "async/semaphore"
 require "nokogiri"
-require "httpclient"
+require "http"
 
 require "mvnrepocopy/storage"
 require "mvnrepocopy/progress"
@@ -18,9 +18,9 @@ module Mvnrepocopy
       @storage = Storage.instance
       @log = @storage
 
-      @http = HTTPClient.new
-      @http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      @http.keep_alive_timeout = 60
+      @http = HTTP
+      # @http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      # @http.keep_alive_timeout = 60
     end
 
     # Fetch the given repository index, parse the response and recursively scan all relative links
@@ -99,13 +99,13 @@ module Mvnrepocopy
           semaphore.async do
             progress.inc
 
-            response = @http.get(index, follow_redirect: true)
-            if response.status_code != 200
-              @log.error "Error reading index page '#{index}': status #{response.status_code}"
+            response = @http.follow.get(index)
+            if response.code != 200
+              @log.error "Error reading index page '#{index}': status #{response.code}"
               next
             end
 
-            extract_links(response.body, index)
+            extract_links(response.body.to_s, index)
           rescue => e
             @log.error "Error reading index page '#{index}': #{e}"
           end
@@ -138,9 +138,9 @@ module Mvnrepocopy
 
       return if @dry_run
 
-      response = @http.get(url, follow_redirect: true)
-      if response.status_code != 200
-        @log.error "Error downloading file '#{url}': status #{response.status_code}"
+      response = @http.follow.get(url)
+      if response.code != 200
+        @log.error "Error downloading file '#{url}': status #{response.code}"
       else
         IO.write(localfile, response.body)
         @log.debug "Downloaded #{url}"

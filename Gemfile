@@ -6,7 +6,6 @@ source "https://rubygems.org"
 gemspec
 
 gem "async", "~> 1.31"
-gem "httpclient", "~> 2.8"
 gem "minitest", "~> 5.0"
 gem "nokogiri", "~> 1.16"
 gem "pry", "~> 0.14.2"
@@ -21,3 +20,5 @@ gem "simplecov", "~> 0.22.0", group: :test, require: false
 gem "mutex_m", "~> 0.3.0"
 
 gem "base64", "~> 0.2.0"
+
+gem "http", "~> 5.3"
