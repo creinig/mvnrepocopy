@@ -4,7 +4,7 @@ require "async/barrier"
 require "async/semaphore"
 require "base64"
 require "uri"
-require "http"
+require "httpclient"
 
 require "mvnrepocopy/storage"
 require "mvnrepocopy/progress"
@@ -65,8 +65,15 @@ module Mvnrepocopy
     private #------------------------------------
 
     def new_http_client
-      HTTP.basic_auth(user: @user, pass: @passwd)
+      http = HTTPClient.new(force_basic_auth: true)
+      http.set_auth(nil, @user, @passwd) if @user && @passwd
+      http.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.keep_alive_timeout = 60
+      # http.connect_timeout = 10
+      # http.send_timeout = 10
+      # http.receive_timeout = 10
       # http.debug_dev = $stderr if @log.debug?
+      http
     end
 
     def upload_dir(dir, http)
@@ -109,22 +116,22 @@ module Mvnrepocopy
       @log.debug("  Uploading to '#{url}'")
       response = http.put(url, body: contents)
 
-      case response.code
+      case response.status_code
       in (200..299)
         @log.debug "Uploaded #{path}"
         @cache << url if @cache
       else
-        @log.error "Upload of #{path} failed with status #{response.code}"
+        @log.error "Upload of #{path} failed with status #{response.status_code}"
         if is_text_type?(response.content_type)
           @log.debug "Error response fron #{path}: #{response.body}"
         end
       end
 
-      response.code
+      response.status_code
     end
 
     def is_text_type?(content_type)
-      content_type && ["text/", "/json", "/xml"].select { |part| content_type.to_s.include? part }.any?
+      content_type && ["text/", "/json", "/xml"].select { |part| content_type.include? part }.any?
     end
 
     def exists_on_server?(path, http)
@@ -136,7 +143,7 @@ module Mvnrepocopy
       response = http.head(url)
 
       # @log.debug "HEAD #{url} => #{status}"
-      exists = response.code == 200
+      exists = response.status_code.to_i == 200
       @cache << url if @cache && exists
       exists
     end
