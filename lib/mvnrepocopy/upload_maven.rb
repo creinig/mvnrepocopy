@@ -77,7 +77,9 @@ module Mvnrepocopy
     end
 
     def upload_dir(dir, http)
-      files = Dir.glob(File.join(dir, "*.pom")).concat(Dir.glob(File.join(dir, "*.jar")))
+      files = Dir.glob(File.join(dir, "*.pom")) +
+        Dir.glob(File.join(dir, "*.jar")) +
+        Dir.glob(File.join(dir, "*.war"))
 
       files.each do |file|
         @log.debug "Trying to upload '#{file}'"
