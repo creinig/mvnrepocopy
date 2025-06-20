@@ -1,16 +1,16 @@
 # Mvnrepocopy
 
-Set of commandline tools for copying maven repositoriesbetween remote hosts. The workflow is designed to allow you to also merge or split repositories while you're at it.
+Set of commandline tools for copying maven repositories between remote hosts. The workflow is designed to allow you to also merge or split repositories while you're at it.
 
 ## Installation
 
-Dependencies are managed by [https://bundler.io](bundler), so to install everything needed you just have to run `bundle install` in this directory.
+Dependencies are managed by [bundler](https://bundler.io), so to install everything needed you just have to run `bundle install` in this directory.
 
 ## Usage
 
 ### export_nexus.rb
 
-`bin/export.nexus.rb` exports a maven repository from a [https://www.sonatype.com/products/sonatype-nexus-repository](nexus 3) server to the local file system.
+`bin/export.nexus.rb` exports a maven repository from a [mexus 3](https://www.sonatype.com/products/sonatype-nexus-repository) server to the local file system.
 Since this can take a while, the script provides options for parallel transfer (`-j`)and local caching of the remote directory structure (`--cache`), and will
 not re-transfer already downloaded files (i.e. will simply resume after an aborted run). See `bin/export.nexus.rb --help` for all available options.
 
