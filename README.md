@@ -10,7 +10,7 @@ Dependencies are managed by [bundler](https://bundler.io), so to install everyth
 
 ### export_nexus.rb
 
-`bin/export.nexus.rb` exports a maven repository from a [mexus 3](https://www.sonatype.com/products/sonatype-nexus-repository) server to the local file system.
+`bin/export.nexus.rb` exports a maven repository from a [nexus 3](https://www.sonatype.com/products/sonatype-nexus-repository) server to the local file system.
 Since this can take a while, the script provides options for parallel transfer (`-j`)and local caching of the remote directory structure (`--cache`), and will
 not re-transfer already downloaded files (i.e. will simply resume after an aborted run). See `bin/export.nexus.rb --help` for all available options.
 
