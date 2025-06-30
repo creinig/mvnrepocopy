@@ -55,8 +55,8 @@ module Mvnrepocopy
       Sync do
         urls.map do |url|
           semaphore.async do
-            download(url)
-            progress.inc
+            bytes = download(url)
+            progress.inc(bytes: bytes)
           end
         end.map(&:wait)
       ensure
@@ -128,22 +128,25 @@ module Mvnrepocopy
         .select { |path| path }
     end
 
+    # @returns number of bytes downloaded
     def download(url)
       localfile = @storage.mkdirs_for(to_repopath(url))
 
       if File.exist?(localfile)
         @log.debug "Skipping #{url} - already exists locally"
-        return
+        return 0
       end
 
-      return if @dry_run
+      return 0 if @dry_run
 
       response = @http.get(url, follow_redirect: true)
       if response.status_code != 200
         @log.error "Error downloading file '#{url}': status #{response.status_code}"
+        0
       else
         IO.write(localfile, response.body)
         @log.debug "Downloaded #{url}"
+        response.body.size
       end
     end
   end

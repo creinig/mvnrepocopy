@@ -49,7 +49,7 @@ module Mvnrepocopy
       Sync do
         package_dirs.map do |dir|
           semaphore.async do
-            upload_dir(dir, http)
+            upload_dir(dir, http, progress)
             progress.inc
           rescue => e
             @log.error "Error uploading package '#{dir}': #{e}"
@@ -76,7 +76,7 @@ module Mvnrepocopy
       http
     end
 
-    def upload_dir(dir, http)
+    def upload_dir(dir, http, progress)
       files = Dir.glob(File.join(dir, "*.pom")) +
         Dir.glob(File.join(dir, "*.jar")) +
         Dir.glob(File.join(dir, "*.war"))
@@ -93,6 +93,7 @@ module Mvnrepocopy
         contents = read_file(file)
 
         upload_file(file, contents, http)
+        progress.inc_bytes contents.size
       end
     end
 
